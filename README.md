@@ -21,7 +21,21 @@ python srgan.py -p image.jpg
 Thats it!
 
 ## Images
+**Original:**      
 
+![original1](https://github.com/aryanmisra/NeuraScale/raw/master/main/tests/test1.jpg)
+
+**SuperResolution:**
+
+![superres1](https://github.com/aryanmisra/NeuraScale/raw/master/main/tests/highres_output1.jpg)
+
+**Original:**
+
+![original2](https://github.com/aryanmisra/NeuraScale/raw/master/main/tests/test2.jpg)
+
+**SuperResolution:**
+
+![superres2](https://github.com/aryanmisra/NeuraScale/raw/master/main/tests/highres_output2.jpg)
 
 
 ## How we built it
@@ -31,4 +45,6 @@ We used **TensorFlow 2.0** as the API for creating and training our SRGAN. The m
 Since most neural networks require a fixed input/output size, figuring out the image preprocessing was a difficult part of our project, as we ran into many bugs and sighed in frustration multiple times. We found a way to split an image into several regular pieces to be fed into the network and then stitch the output together to end up with a proper, upscaled image.
 
 ## What's next for NeuraScale
-Our next steps for NeuraScale include smoothing out some of the rough edges in our code, converting the model to use it in a web app with TF.js or as a native app with TF Lite, and possibly retraining the model to output with colour enhancements.
+Our next steps for NeuraScale include smoothing out some of the rough edges in our code, converting the model to use it in a web app with TF.js or as a native app with TF Lite, and possibly retraining the model to output with colour enhancements. 
+
+We also plan to heavily improve our model performance, as hardware limitation have resulted in poor convergence.
