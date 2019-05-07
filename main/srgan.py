@@ -299,9 +299,7 @@ class SRGAN(keras.Model):
             except ValueError:
                 pass
         save_paths = max(save_paths)
-        # model_path = ('../saves/%s/model.h5' % (save_paths))
-        model_path = ('../saves/2150/model.h5')
-        #print(model_path)
+        model_path = ('../saves/%s/model.h5' % (save_paths))
         self.generator = keras.models.load_model(model_path)
         self.generator.compile(loss='mse',
                               optimizer=tf.optimizers.Adam(0.0002, 0.5))
@@ -312,17 +310,12 @@ class SRGAN(keras.Model):
         for r in range(0,self.slicer.r*self.slicer.c):
             img = self.batch_images[r,:,:,:]
             img = np.expand_dims(img, axis=0)
-            # print(img.shape)
-            # print(np.max(img))
-            # print(str(img.shape)+"    IMAGE SHAPE")
-
             fake_img = self.generator.predict(img)
             fake_img = np.array(fake_img)
             fake_img = np.squeeze(fake_img,axis=0)
-            fake_img = np.array(((fake_img + 1)*127.5), dtype=np.uint8)
+            fake_img = np.array(((fake_img + 0.2)*200), dtype=np.uint8)
 
             Image.fromarray(fake_img.astype(np.uint8)).save("temp/img%s.jpg" % r)
-            # print(str(fake_img.shape)+ "    FAKE IMAGE")
             fake_img_batch.append(fake_img)
         img_max_width = self.slicer.c*400
         img_max_height = self.slicer.r*400
@@ -330,7 +323,6 @@ class SRGAN(keras.Model):
         fake_img_batch = np.squeeze(fake_img_batch,axis=1)
         fake_img_batch = np.array(((fake_img_batch + 1)*127.5), dtype=int)
         fake_img_batch = np.reshape(fake_img_batch, (img_max_height,img_max_width,3),order='A')
-        # print(str(fake_img_batch.shape)+ "    FAKE IMAGE BATCH")
         ims = os.listdir('temp')
         big_im = Image.new('RGB', (img_max_width,img_max_height))
         yy =0
