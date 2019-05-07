@@ -1,5 +1,6 @@
 # NeuraScale
 [Video](https://www.youtube.com/watch?v=TljSnrx5Mxc&feature=youtu.be) for Powered by TF2.0 challenge.
+[Website](https://aryanmisra.com/neurascale/)
 ## What it does
 _NeuraScale_, the fancy name we gave our project, is basically a Super Resolution Generative Adversarial Network (SRGAN) with the purpose of upscaling image resolutions by a factor of two using deep learning. This way, a picture which initially appears pixellated and/or blurry can be modified so that the features are quite more distinguishable. The model is trained on the COCO unlabeled2017 dataset. Download [here](http://cocodataset.org/#download).
 
@@ -64,3 +65,10 @@ Since most neural networks require a fixed input/output size, figuring out the i
 Our next steps for NeuraScale include smoothing out some of the rough edges in our code, converting the model to use it in a web app with TF.js or as a native app with TF Lite, and possibly retraining the model to output with colour enhancements. 
 
 We also plan to heavily improve our model performance, as hardware limitation have resulted in poor convergence.
+
+## Meta
+
+[Aryan Misra](http://aryanmisra.com)
+[Alex Yu](https://alexyu.ca)
+
+Distributed under the GNU General Public License v3.0. See ```license``` for more information.
