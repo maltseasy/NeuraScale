@@ -10,7 +10,8 @@ import os
 import tensorflow as tf
 import glob
 import argparse
-from prepreprocessing import ImageSlicer
+from preprocessing import ImageSlicer
+from PIL import Image, ImageEnhance
 parser = argparse.ArgumentParser()
 parser.add_argument("--rem", '-r', help="delete files in directories saves and images",
                     action="store_true")
@@ -28,11 +29,11 @@ class SRGAN(keras.Model):
     def __init__(self):
         super(SRGAN, self).__init__()
         self.channels = 3
-        self.lr_height = 200              # Low resolution height
-        self.lr_width = 200                  # Low resolution width
+        self.lr_height = 200
+        self.lr_width = 200
         self.lr_shape = (self.lr_height, self.lr_width, self.channels)
-        self.hr_height = self.lr_height*2   # High resolution height
-        self.hr_width = self.lr_width*2     # High resolution width
+        self.hr_height = self.lr_height*2
+        self.hr_width = self.lr_width*2
         self.hr_shape = (self.hr_height, self.hr_width, self.channels)
         self.n_residual_blocks = 16
         optimizer = tf.optimizers.Adam(0.0002, 0.5)
@@ -178,7 +179,6 @@ class SRGAN(keras.Model):
         for epoch in range(epochs):
 
             imgs_hr, imgs_lr = self.data_loader.load_data(batch_size)
-            print(imgs_lr.shape)
             fake_hr = self.generator.predict(imgs_lr)
             valid = np.ones((batch_size,) + self.disc_patch)
             fake = np.zeros((batch_size,) + self.disc_patch)
@@ -287,6 +287,10 @@ class SRGAN(keras.Model):
             plt.close()
 
     def batch_image(self, path):
+        filesToRemove = [os.path.join('temp/',f) for f in os.listdir('temp/')]
+        for f in filesToRemove:
+            os.remove(f)
+        self.im_path = path
         files = '../saves/'
         save_paths = []
         for file in glob.glob("../saves/*"):
@@ -295,53 +299,65 @@ class SRGAN(keras.Model):
             except ValueError:
                 pass
         save_paths = max(save_paths)
-        model_path = ('../saves/%s/model.h5' % (save_paths))
+        # model_path = ('../saves/%s/model.h5' % (save_paths))
+        model_path = ('../saves/2150/model.h5')
         #print(model_path)
         self.generator = keras.models.load_model(model_path)
+        self.generator.compile(loss='mse',
+                              optimizer=tf.optimizers.Adam(0.0002, 0.5))
         self.slicer = ImageSlicer(path, (200,200),BATCH=False, PADDING=False)
         self.transformed_image = self.slicer.transform()
         self.batch_images = self.slicer.save_images(self.transformed_image)
         fake_img_batch = []
         for r in range(0,self.slicer.r*self.slicer.c):
-            print(r)
             img = self.batch_images[r,:,:,:]
             img = np.expand_dims(img, axis=0)
             # print(img.shape)
             # print(np.max(img))
-            print(str(img.shape)+"    IMAGE SHAPE")
+            # print(str(img.shape)+"    IMAGE SHAPE")
 
             fake_img = self.generator.predict(img)
             fake_img = np.array(fake_img)
-            print(str(fake_img.shape)+ "    FAKE IMAGE")
+            fake_img = np.squeeze(fake_img,axis=0)
+            fake_img = np.array(((fake_img + 1)*127.5), dtype=np.uint8)
+
+            Image.fromarray(fake_img.astype(np.uint8)).save("temp/img%s.jpg" % r)
+            # print(str(fake_img.shape)+ "    FAKE IMAGE")
             fake_img_batch.append(fake_img)
-        fake_img_batch = np.array(fake_img_batch)
+        img_max_width = self.slicer.c*400
+        img_max_height = self.slicer.r*400
+
         fake_img_batch = np.squeeze(fake_img_batch,axis=1)
-        print(str(fake_img_batch.shape)+ "    FAKE IMAGE BATCH")
-        img_max_width = self.slicer.r*400
-        img_max_height = self.slicer.c*400
+        fake_img_batch = np.array(((fake_img_batch + 1)*127.5), dtype=int)
+        fake_img_batch = np.reshape(fake_img_batch, (img_max_height,img_max_width,3),order='A')
+        # print(str(fake_img_batch.shape)+ "    FAKE IMAGE BATCH")
+        ims = os.listdir('temp')
+        big_im = Image.new('RGB', (img_max_width,img_max_height))
+        yy =0
+        xx=0
+        xy=0
+        while xx != self.slicer.r+1:
+            im = Image.open("temp/%s"%ims[xy])
+            xy+=1
 
-        # for rr in range(0,self.slicer.r*self.slicer.c):
-        oof = np.vstack((fake_img_batch[0,:,:,:],np.hstack((fake_img_batch[0,:,:,:],fake_img_batch[1,:,:,:]))))
-
-        print(oof.shape)
-
-        # hold = fake_img_batch[0,:400,:400,:3]
-        # # hold = np.squeeze(hold, axis=0)
-        # print((hold.shape))
-        #
-        # fake_img_batch = np.concatenate((fake_img_batch[0,:400,:400,:3],fake_img_batch[1,:400,:400,:3]),axis=0)
-        # print(fake_img_batch.shape)
-        # fake_img_batch_2 = np.concatenate((fake_img_batch[:800,:400,:3],fake_img_batch[:400,:400,:3]),axis=1)
-        # print(fake_img_batch_2.shape)
-        # print(fake_img_batch.shape)
-
-
-
-
+            if xx == self.slicer.r:
+                big_im.paste(im, (xx*400,yy))
+                if yy < self.slicer.c:
+                    yy+=400
+                    xx=0
+                else:
+                    break
+            elif xx < self.slicer.r:
+                big_im.paste(im, (xx*400,yy))
+                xx+=1
+            if xy == self.slicer.r*self.slicer.c:
+                break
+        enhancer_object = ImageEnhance.Contrast(big_im)
+        out = enhancer_object.enhance(1.3)
+        out.save('highres_output.jpg')
 if __name__ == '__main__':
     gan = SRGAN()
-    # if args.pred is not None:
-    #     gan.pred_images(args.pred)
-    # else:
-    #     gan.train(epochs=30000, batch_size=1, sample_interval=50)
-    gan.batch_image(gan.im_path)
+    if args.pred is not None:
+        gan.batch_image(args.pred)
+    else:
+        gan.train(epochs=30000, batch_size=1, sample_interval=50)

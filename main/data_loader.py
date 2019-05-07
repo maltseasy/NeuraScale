@@ -35,7 +35,6 @@ class DataLoader():
 
         imgs_hr = np.array(imgs_hr) / 127.5 - 1.
         imgs_lr = np.array(imgs_lr) / 127.5 - 1.
-        #print(str(imgs_hr)+str(imgs_lr))
         return imgs_hr, imgs_lr
     def load_pred(self, path):
         img = self.imread(path)
@@ -50,9 +49,6 @@ class DataLoader():
         imgs_hr = np.array(imgs_hr) / 127.5 - 1.
         imgs_lr = np.array(imgs_lr) / 127.5 - 1.
         return imgs_hr, imgs_lr
-
-    def stich(self,image):
-
 
     def imread(self, path):
         return scipy.misc.imread(path, mode='RGB').astype(np.float)
