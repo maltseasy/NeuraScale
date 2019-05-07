@@ -1,5 +1,5 @@
 # NeuraScale
-
+[Video](https://www.youtube.com/watch?v=TljSnrx5Mxc&feature=youtu.be)
 ## What it does
 _NeuraScale_, the fancy name we gave our project, is basically a Super Resolution Generative Adversarial Network (SRGAN) with the purpose of upscaling image resolutions by a factor of two using deep learning. This way, a picture which initially appears pixellated and/or blurry can be modified so that the features are quite more distinguishable. 
 
