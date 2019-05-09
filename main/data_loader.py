@@ -50,5 +50,17 @@ class DataLoader():
         imgs_lr = np.array(imgs_lr) / 127.5 - 1.
         return imgs_hr, imgs_lr
 
+    def load_resize(self, path):
+        img = self.imread(path)
+        imgs_hr = []
+        imgs_lr = []
+        h, w = self.img_res
+        low_h, low_w = int(h/2), int(w/2)
+        img_hr = scipy.misc.imresize(img, (self.img_res))
+        img_lr = scipy.misc.imresize(img, (img_lr))
+        imgs_hr = np.array(imgs_hr) / 127.5 - 1.
+        imgs_lr = np.array(imgs_lr) / 127.5 - 1.
+        imgs_hr = np.resize(imgs_hr, (-1, 400,400,3))
+
     def imread(self, path):
         return scipy.misc.imread(path, mode='RGB').astype(np.float)

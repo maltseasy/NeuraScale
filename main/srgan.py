@@ -120,7 +120,6 @@ class SRGAN(keras.Model):
             u = keras.layers.Conv2D(256, kernel_size=3, strides=1, padding='same')(u)
             u = keras.layers.Activation('relu')(u)
             return u
-
         # Low resolution image input
         img_lr = keras.Input(shape=self.lr_shape)
 
@@ -250,18 +249,12 @@ class SRGAN(keras.Model):
 
         save_paths = max(save_paths)
         model_path = ('../saves/%s/model.h5' % (save_paths))
-        print(model_path)
         self.generator = keras.models.load_model(model_path)
-        #self.generator.compile(loss='mse',
-        #                      optimizer=tf.optimizers.Adam(0.0002, 0.5))
+        
         os.makedirs('../images/%s' % self.dataset_name, exist_ok=True)
         r, c = 2, 2
-        #imgs_hr, imgs_lr = self.data_loader.load_data(batch_size=2, is_testing=True)
         imgs_hr, imgs_lr = self.data_loader.load_pred(im_path)
         fake_hr = self.generator.predict(imgs_lr)
-        print(imgs_lr.shape)
-        print(fake_hr.shape)
-
         # Rescale images 0 - 1
         imgs_lr = 0.5 * imgs_lr + 0.5
         fake_hr = 0.5 * fake_hr + 0.5
